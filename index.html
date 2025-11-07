@@ -3,35 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nybörjarens Todo (en fil, färre hjälpfunktioner)</title>
+  <title>Todo (en fil, utan kommentarer)</title>
   <style>
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: linear-gradient(135deg,#0f172a,#000); color: #e5e7eb; }
-
     .page { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; }
-    .card { width: 100%; max-width: 520px; background: rgba(2,6,23,0.65); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); overflow: hidden; opacity: 0; transform: translateY(-50px); }
+    .card { width: 100%; max-width: 520px; background: rgba(2,6,23,0.65); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); overflow: hidden; opacity: 1; transform: translateY(0); }
     .card.page-visible { animation: pageDropIn 0.6s cubic-bezier(.16,1,.3,1) forwards; }
     @keyframes pageDropIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
-
     .header { padding: 18px 20px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
     .title { margin: 0; font-size: 22px; font-weight: 700; }
     .subtitle { margin: 6px 0 0; font-size: 13px; color: #94a3b8; }
-
     .row { display: flex; gap: 8px; padding: 14px 16px; align-items: flex-start; }
     .textBox { flex: 1; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); padding: 12px 14px; background: rgba(15,23,42,0.65); color: #e5e7eb; outline: none; font-size: 15px; }
     .textBox:focus { border-color: rgba(56,189,248,0.7); box-shadow: 0 0 0 2px rgba(56,189,248,0.35); }
     .okButton { background: #38bdf8; color: #0f172a; border: none; padding: 12px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; }
     .okButton:active { transform: scale(0.98); }
-
     .errorText { margin: 4px 16px 0; font-size: 13px; color: #fca5a5; opacity: 0; height: 0; overflow: hidden; }
     .errorText.visible { opacity: 1; height: auto; }
     .textBox.errorBlink { animation: blinkRed 0.5s ease-in-out 1; }
     @keyframes blinkRed { 0%{ box-shadow: 0 0 0 0 rgba(248,113,113,0.8); border-color: #f87171;} 50%{ box-shadow: 0 0 0 3px rgba(248,113,113,0.35);} 100%{ box-shadow: 0 0 0 0 rgba(248,113,113,0.0);} }
-
     .stats { display: flex; justify-content: space-between; align-items: center; color: #94a3b8; font-size: 12px; padding: 0 16px 10px; }
     .clearAll { font-size: 12px; color: #cbd5e1; background: transparent; border: none; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
-
     .list { padding: 0; margin: 0; list-style: none; border-top: 1px solid rgba(255,255,255,0.06); }
     .todoItem { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); user-select: none; cursor: pointer; }
     .todoBullet { height: 20px; width: 20px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25); background: transparent; pointer-events: none; }
@@ -40,40 +34,33 @@
     .todoItem.done .todoBullet { background: #34d399; border-color: #34d399; }
     .deleteBtn { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #e5e7eb; border-radius: 8px; padding: 6px 8px; cursor: pointer; opacity: 0.85; }
     .deleteBtn:hover { opacity: 1; }
-
     .justAdded { animation: itemPopIn 0.35s ease-out both; }
     @keyframes itemPopIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
   <div class="page">
-    <div id="todoCard" class="card">
+    <div id="todoCard" class="card page-visible">
       <div class="header">
         <h1 class="title">My Todo List</h1>
-        <p class="subtitle">En fil, enkla lösningar, nästan inga hjälpfunktioner.</p>
+        <p class="subtitle">En fil, enkla lösningar.</p>
       </div>
-
       <div class="row">
         <input id="todoInputBox" class="textBox" placeholder="Vad behöver göras?" />
         <button id="okButton" class="okButton">OK</button>
       </div>
       <p id="errorText" class="errorText">Skriv något innan du lägger till.</p>
-
       <div class="stats">
         <div>Klarmarkeringar: <b id="completedCounter">0</b></div>
         <div>Kvar: <b id="remainingCounter">0</b></div>
         <button id="clearAll" class="clearAll" type="button">Rensa alla</button>
       </div>
-
       <ul id="todoList" class="list"></ul>
     </div>
   </div>
-
   <script>
-    
-    var todoArrayWithAllItems = []; 
+    var todoArrayWithAllItems = [];
     var completedCountOnlyGoesUp = 0;
-
     var elCard = document.getElementById('todoCard');
     var elInput = document.getElementById('todoInputBox');
     var elOk = document.getElementById('okButton');
@@ -82,12 +69,11 @@
     var elCompleted = document.getElementById('completedCounter');
     var elRemaining = document.getElementById('remainingCounter');
     var elClearAll = document.getElementById('clearAll');
-
-    
     window.addEventListener('DOMContentLoaded', function(){
-      setTimeout(function(){ elCard.classList.add('page-visible'); elInput.focus(); }, 10);
+      elCard.classList.remove('page-visible');
+      setTimeout(function(){ elCard.classList.add('page-visible'); }, 10);
+      elInput.focus();
     });
-
     function rebuildCountersInline(){
       var remainingNow = 0;
       for (var i = 0; i < todoArrayWithAllItems.length; i++) {
@@ -96,7 +82,6 @@
       elRemaining.textContent = String(remainingNow);
       elCompleted.textContent = String(completedCountOnlyGoesUp);
     }
-
     elOk.addEventListener('click', function(){
       var typed = (elInput.value || '').trim();
       if (!typed) {
@@ -106,45 +91,24 @@
         return;
       }
       elError.classList.remove('visible');
-
       var newItem = { id: Math.random().toString(36).slice(2) + Date.now().toString(36), text: typed, done: false };
-      
       todoArrayWithAllItems.unshift(newItem);
-      
       var li = document.createElement('li');
       li.className = 'todoItem justAdded';
       li.setAttribute('data-id', newItem.id);
-
-      var bullet = document.createElement('div');
-      bullet.className = 'todoBullet';
-      li.appendChild(bullet);
-
-      var textDiv = document.createElement('div');
-      textDiv.className = 'todoText';
-      textDiv.textContent = newItem.text;
-      li.appendChild(textDiv);
-
-      var del = document.createElement('button');
-      del.className = 'deleteBtn';
-      del.type = 'button';
-      del.textContent = 'Delete';
-      li.appendChild(del);
-
-      
+      var bullet = document.createElement('div'); bullet.className = 'todoBullet'; li.appendChild(bullet);
+      var textDiv = document.createElement('div'); textDiv.className = 'todoText'; textDiv.textContent = newItem.text; li.appendChild(textDiv);
+      var del = document.createElement('button'); del.className = 'deleteBtn'; del.type = 'button'; del.textContent = 'Delete'; li.appendChild(del);
       li.addEventListener('click', function(e){
         if (e.target === del) return;
-        
         for (var i = 0; i < todoArrayWithAllItems.length; i++) {
           if (todoArrayWithAllItems[i].id === newItem.id) {
             var wasDone = todoArrayWithAllItems[i].done;
             todoArrayWithAllItems[i].done = !todoArrayWithAllItems[i].done;
-            if (!wasDone && todoArrayWithAllItems[i].done) {
-              completedCountOnlyGoesUp++;
-            }
+            if (!wasDone && todoArrayWithAllItems[i].done) { completedCountOnlyGoesUp++; }
             break;
           }
         }
-        
         while (elList.firstChild) { elList.removeChild(elList.firstChild); }
         for (var j = 0; j < todoArrayWithAllItems.length; j++) {
           var it = todoArrayWithAllItems[j];
@@ -154,11 +118,9 @@
           var b2 = document.createElement('div'); b2.className = 'todoBullet'; li2.appendChild(b2);
           var t2 = document.createElement('div'); t2.className = 'todoText'; t2.textContent = it.text; li2.appendChild(t2);
           var d2 = document.createElement('button'); d2.className = 'deleteBtn'; d2.type = 'button'; d2.textContent = 'Delete'; li2.appendChild(d2);
-          
           (function(storeId){
             li2.addEventListener('click', function(ev){
               if (ev.target === d2) return;
-              
               for (var k = 0; k < todoArrayWithAllItems.length; k++) {
                 if (todoArrayWithAllItems[k].id === storeId) {
                   var was = todoArrayWithAllItems[k].done;
@@ -167,7 +129,6 @@
                   break;
                 }
               }
-              
               while (elList.firstChild) { elList.removeChild(elList.firstChild); }
               for (var m = 0; m < todoArrayWithAllItems.length; m++) {
                 var it3 = todoArrayWithAllItems[m];
@@ -192,37 +153,6 @@
                     var b4 = document.createElement('div'); b4.className = 'todoBullet'; li4.appendChild(b4);
                     var t4 = document.createElement('div'); t4.className = 'todoText'; t4.textContent = itm.text; li4.appendChild(t4);
                     var d4 = document.createElement('button'); d4.className = 'deleteBtn'; d4.type = 'button'; d4.textContent = 'Delete'; li4.appendChild(d4);
-                    (function(idForDel2){ d4.addEventListener('click', function(){
-                      var next2 = [];
-                      for (var q = 0; q < todoArrayWithAllItems.length; q++) {
-                        if (todoArrayWithAllItems[q].id !== idForDel2) next2.push(todoArrayWithAllItems[q]);
-                      }
-                      todoArrayWithAllItems = next2;
-                      while (elList.firstChild) { elList.removeChild(elList.firstChild); }
-                      for (var r = 0; r < todoArrayWithAllItems.length; r++) {
-                        var itx = todoArrayWithAllItems[r];
-                        var liX = document.createElement('li');
-                        liX.className = 'todoItem' + (itx.done ? ' done' : '');
-                        liX.setAttribute('data-id', itx.id);
-                        var bX = document.createElement('div'); bX.className = 'todoBullet'; liX.appendChild(bX);
-                        var tX = document.createElement('div'); tX.className = 'todoText'; tX.textContent = itx.text; liX.appendChild(tX);
-                        var dX = document.createElement('button'); dX.className = 'deleteBtn'; dX.type = 'button'; dX.textContent = 'Delete'; liX.appendChild(dX);
-                        (function(idForDelX){ dX.addEventListener('click', function(){
-                          var nextX = [];
-                          for (var s = 0; s < todoArrayWithAllItems.length; s++) {
-                            if (todoArrayWithAllItems[s].id !== idForDelX) nextX.push(todoArrayWithAllItems[s]);
-                          }
-                          todoArrayWithAllItems = nextX;
-                          while (elList.firstChild) { elList.removeChild(elList.firstChild); }
-                          for (var t = 0; t < todoArrayWithAllItems.length; t++) {
-                            
-                          }
-                          rebuildCountersInline();
-                        }); })(idForDel2);
-                        elList.appendChild(liX);
-                      }
-                      rebuildCountersInline();
-                    }); })(idForDel);
                     elList.appendChild(li4);
                   }
                   rebuildCountersInline();
@@ -232,7 +162,6 @@
               rebuildCountersInline();
             });
           })(it.id);
-          
           (function(idForImmediateDel){
             d2.addEventListener('click', function(){
               var arr = [];
@@ -273,24 +202,44 @@
               rebuildCountersInline();
             });
           })(it.id);
-
+          elList.appendChild(li2);
+        }
+        rebuildCountersInline();
+      });
+      (function(idForDelInit){
+        del.addEventListener('click', function(){
+          var arr2 = [];
+          for (var a = 0; a < todoArrayWithAllItems.length; a++) {
+            if (todoArrayWithAllItems[a].id !== idForDelInit) arr2.push(todoArrayWithAllItems[a]);
+          }
+          todoArrayWithAllItems = arr2;
+          while (elList.firstChild) { elList.removeChild(elList.firstChild); }
+          for (var b = 0; b < todoArrayWithAllItems.length; b++) {
+            var it0 = todoArrayWithAllItems[b];
+            var li0 = document.createElement('li');
+            li0.className = 'todoItem' + (it0.done ? ' done' : '');
+            li0.setAttribute('data-id', it0.id);
+            var bb = document.createElement('div'); bb.className = 'todoBullet'; li0.appendChild(bb);
+            var tt = document.createElement('div'); tt.className = 'todoText'; tt.textContent = it0.text; li0.appendChild(tt);
+            var dd = document.createElement('button'); dd.className = 'deleteBtn'; dd.type = 'button'; dd.textContent = 'Delete'; li0.appendChild(dd);
+            elList.appendChild(li0);
+          }
+          rebuildCountersInline();
+        });
+      })(newItem.id);
       elList.insertBefore(li, elList.firstChild);
       setTimeout(function(){ li.classList.remove('justAdded'); }, 400);
       elInput.value = '';
       elInput.focus();
       rebuildCountersInline();
     });
-
     elInput.addEventListener('keydown', function(e){ if (e.key === 'Enter') elOk.click(); });
     elInput.addEventListener('input', function(){ elError.classList.remove('visible'); });
-
     elClearAll.addEventListener('click', function(){
       todoArrayWithAllItems = [];
       while (elList.firstChild) { elList.removeChild(elList.firstChild); }
       rebuildCountersInline();
     });
-
-    
     rebuildCountersInline();
   </script>
 </body>
